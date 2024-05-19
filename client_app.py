@@ -1,7 +1,8 @@
 from tkinter import *
-from tkinter import filedialog
+from tkinter import filedialog, messagebox
 import socket
 import pyexcel
+import os
 from util.fileio import receive_file
 
 client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -9,15 +10,13 @@ client.connect(("localhost", 8000))
 
 
 def select_file_1():
-    file_path = filedialog.askopenfilename(
-        filetypes=[("CSV files", "examinator.csv")])
+    file_path = filedialog.askopenfilename(filetypes=[("CSV files", "*.csv")])
     if file_path:
         label_file_1.config(text=file_path)
 
 
 def select_file_2():
-    file_path = filedialog.askopenfilename(
-        filetypes=[("CSV files", "room.csv")])
+    file_path = filedialog.askopenfilename(filetypes=[("CSV files", "*.csv")])
     if file_path:
         label_file_2.config(text=file_path)
 
@@ -71,11 +70,39 @@ def add_command():
 
                     sheet = pyexcel.get_sheet(
                         file_name="out_remain.csv", delimiter=",")
-                sheet.save_as("DanhSachGiamSat.xlsx")
+                    sheet.save_as("DanhSachGiamSat.xlsx")
+
+                    # Open the new window with the buttons
+                    open_result_window()
             else:
                 print("Error")
         else:
             print("Error")
+
+
+def open_file(file_path):
+    try:
+        os.startfile(file_path)  # Windows
+    except AttributeError:
+        try:
+            subprocess.call(['open', file_path])  # Mac
+        except:
+            subprocess.call(['xdg-open', file_path])  # Linux
+
+
+def open_result_window():
+    result_window = Toplevel(root)
+    result_window.geometry("400x200")
+    result_window.configure(bg="#f0f0f0")
+    result_window.title("Generated Files")
+
+    btn_view_phancong = Button(result_window, text="Xem DanhSachPhanCong.xlsx", bg="#4CAF50", fg="white",
+                               font=('Helvetica', 12), relief=FLAT, command=lambda: open_file("DanhSachPhanCong.xlsx"))
+    btn_view_phancong.pack(pady=20)
+
+    btn_view_giamsat = Button(result_window, text="Xem DanhSachGiamSat.xlsx", bg="#4CAF50", fg="white",
+                              font=('Helvetica', 12), relief=FLAT, command=lambda: open_file("DanhSachGiamSat.xlsx"))
+    btn_view_giamsat.pack(pady=20)
 
 
 root = Tk()
@@ -95,15 +122,15 @@ label_file_1 = Label(root, text="Chưa chọn file",
 label_file_1.pack(pady=5)
 
 btn_file_2 = Button(root, text="Chọn Phòng Thi CSV",
-                    bg="#4CAF50", fg="white", font=('Helvetica', 12), relief=FLAT,  command=select_file_2)
+                    bg="#4CAF50", fg="white", font=('Helvetica', 12), relief=FLAT, command=select_file_2)
 btn_file_2.pack(pady=10)
 
 label_file_2 = Label(root, text="Chưa chọn file",
                      bg="#f0f0f0", fg="#333333", font=('Helvetica', 12))
 label_file_2.pack(pady=5)
 
-btn_add = Button(root, text="Add", bg="#2196F3", fg="white",
-                 font=('Helvetica', 12), relief=FLAT, command=add_command)
+btn_add = Button(root, text="Add", bg="#2196F3", fg="white", font=(
+    'Helvetica', 12), relief=FLAT, command=add_command)
 btn_add.pack(pady=20)
 
 root.mainloop()
