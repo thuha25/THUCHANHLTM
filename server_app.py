@@ -43,9 +43,9 @@ def client_handler(server: Server, client: socket.socket, addr):
             size = int(commands[1])
             client.send(b"ready")
             logger.log("Receiving examinator file")
-            receive_file(client, "_examinator.csv", size)
+            receive_file(client, "_CanBoCoiThi.csv", size)
             logger.log("Examinator file received")
-            importdb .import_examinators("_examinator.csv")
+            importdb .import_examinators("_CanBoCoiThi.csv")
             logger.log("Examinator file received")
             client.send(b"done")
 
