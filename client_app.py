@@ -4,25 +4,33 @@ import socket
 import pyexcel
 import os
 from util.fileio import receive_file
+import excel_converter
 
 client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 client.connect(("localhost", 8000))
 
 
 def select_file_1():
-    file_path = filedialog.askopenfilename(filetypes=[("CSV files", "*.csv")])
+    # file_path = filedialog.askopenfilename(filetypes=[("CSV files", "*.csv")])
+    file_path = filedialog.askopenfilename(
+        filetypes=[("Excel files", "*.xlsx")])
     if file_path:
         label_file_1.config(text=file_path)
 
 
 def select_file_2():
-    file_path = filedialog.askopenfilename(filetypes=[("CSV files", "*.csv")])
+    # file_path = filedialog.askopenfilename(
+    #     filetypes=[("CSV files", "*.csv")])
+    file_path = filedialog.askopenfilename(
+        filetypes=[("Excel files", "*.xlsx")])
     if file_path:
         label_file_2.config(text=file_path)
 
 
 def add_command():
-    with open(label_file_1.cget("text"), "rb") as f:
+    #   with open(label_file_1.cget("text"), "rb") as f:
+    excel_converter.convert_examinator(label_file_1.cget("text"))
+    with open(excel_converter.OUT_EXAMINATOR_CSV, "rb") as f:
         data = f.read()
         msg = f"set_examinator {len(data)}"
         client.send(msg.encode())
@@ -32,8 +40,9 @@ def add_command():
             msg = client.recv(1024).decode()
             if msg == "done":
                 print("Examinator file received")
-
-    with open(label_file_2.cget("text"), "rb") as f:
+#  with open(label_file_2.cget("text"), "rb") as f:
+    excel_converter.convert_room(label_file_2.cget("text"))
+    with open(excel_converter.OUT_ROOM_CSV, "rb") as f:
         data = f.read()
         msg = f"set_room {len(data)}"
         client.send(msg.encode())
@@ -113,7 +122,7 @@ w = Label(root, text='Phân công cán bộ coi thi', font=(
     'Helvetica', 16), bg="#f0f0f0", fg="#333333")
 w.pack(pady=20)
 
-btn_file_1 = Button(root, text="Chọn Giám Thị Coi Thi CSV",
+btn_file_1 = Button(root, text="Chọn Giám Thị Coi Thi Excel",
                     bg="#4CAF50", fg="white", font=('Helvetica', 12), relief=FLAT, command=select_file_1)
 btn_file_1.pack(pady=10)
 
@@ -121,7 +130,7 @@ label_file_1 = Label(root, text="Chưa chọn file",
                      bg="#f0f0f0", fg="#333333", font=('Helvetica', 12))
 label_file_1.pack(pady=5)
 
-btn_file_2 = Button(root, text="Chọn Phòng Thi CSV",
+btn_file_2 = Button(root, text="Chọn Phòng Thi Excel",
                     bg="#4CAF50", fg="white", font=('Helvetica', 12), relief=FLAT, command=select_file_2)
 btn_file_2.pack(pady=10)
 
